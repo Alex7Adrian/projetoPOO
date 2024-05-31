@@ -1,8 +1,10 @@
+# Adicione as importações necessárias
 from datetime import datetime
 
-# Classe Quarto (Wesley)
+
+
 class Quarto:
-    def init(self, numero, tipo, capacidade, preco, disponibilidade=True):
+    def __init__(self, numero, tipo, capacidade, preco, disponibilidade=True):
         self.numero = numero
         self.tipo = tipo
         self.capacidade = capacidade
@@ -27,9 +29,9 @@ class Quarto:
                 return False
         return True
 
-# Classe Auditorio (Rian)
+
 class Auditorio:
-    def init(self, capacidade, preco_por_hora, disponibilidade=True):
+    def __init__(self, capacidade, preco_por_hora, disponibilidade=True):
         self.capacidade = capacidade
         self.preco_por_hora = preco_por_hora
         self.disponibilidade = disponibilidade
@@ -52,43 +54,38 @@ class Auditorio:
                 return False
         return True
 
-# Classe Refeicao (Alex)
+
 class Refeicao:
-    def __init__(self, nome, descricao, preco, horario_disponibilidade):
+    def __init__(self, nome, descricao, preco, horario_disponibilidade,quantidade=1):
         self.nome = nome
         self.descricao = descricao
         self.preco = preco
         self.horario_disponibilidade = horario_disponibilidade
         self.agendamentos = []
+        self.quantidade = quantidade
 
     def agendar(self, data, horario):
-        self.agendamentos.append({"data": data, "horario": horario})
+        if len(self.agendamentos) < self.quantidade:  # Verificando a quantidade de agendamentos
+            self.agendamentos.append({"data": data, "horario": horario})
+            return True
+        else:
+            return False
 
-
-# Funções para gerar relatórios (Paulo)
 def gerar_relatorio_ocupacao(quartos):
     relatorio = []
     for quarto in quartos:
         relatorio.append({"numero": quarto.numero, "reservas": len(quarto.reservas)})
     return relatorio
 
-def gerar_relatorio_faturamento(quartos, auditorio):
+def gerar_relatorio_faturamento(quartos, auditorio,refeicao):
     faturamento = 0
     for quarto in quartos:
         faturamento += quarto.preco * len(quarto.reservas)
     faturamento += auditorio.preco_por_hora * len(auditorio.reservas)
+    faturamento += refeicao.preco * len(refeicao.quantidade)
     return faturamento
 
-# Função para controle de acesso (simplificado) (Vinicius)
-def controle_de_acesso(usuario, permissao):
-    permissoes = {
-        "administrador": ["cadastrar", "reservar", "remover", "relatorios"],
-        "funcionario": ["reservar", "remover"],
-        "hospede": ["reservar"]
-    }
-    return permissao in permissoes.get(usuario, [])
 
-# Menu interativo (Victor Fernando)
 def menu():
     quartos = []
     auditorio = None
@@ -106,7 +103,7 @@ def menu():
         print("9. Cadastrar refeição")
         print("10. Agendar refeição")
         print("11. Gerar relatório de ocupação")
-        print("12. Gerar relatorio de faturamento")
+        print("12. Gerar relatório de faturamento")
         print("13. Sair")
 
         opcao = input("Escolha uma opção: ")
@@ -117,7 +114,7 @@ def menu():
             capacidade = int(input("Capacidade: "))
             preco = float(input("Preço por noite: "))
             disponibilidade = input("Disponibilidade (sim/não): ").lower() == "sim"
-            quartos.append((numero, tipo, capacidade, preco, disponibilidade))
+            quartos.append(Quarto(numero, tipo, capacidade, preco, disponibilidade))
             print("Quarto cadastrado com sucesso!")
 
         elif opcao == "2":
@@ -155,7 +152,7 @@ def menu():
             capacidade = int(input("Capacidade do auditório: "))
             preco_por_hora = float(input("Preço por hora: "))
             disponibilidade = input("Disponibilidade (sim/não): ").lower() == "sim"
-            auditorio = (capacidade, preco_por_hora, disponibilidade)
+            auditorio = Auditorio(capacidade, preco_por_hora, disponibilidade)
             print("Auditório cadastrado com sucesso!")
 
         elif opcao == "7":
@@ -187,15 +184,16 @@ def menu():
             nome = input("Nome da refeição: ")
             descricao = input("Descrição: ")
             preco = float(input("Preço: "))
+            quantidade = input("quantidade: ")
             horario_disponibilidade = input("Horário de disponibilidade: ")
-            refeicao = Refeicao(nome, descricao, preco, horario_disponibilidade)
+            refeicao = Refeicao(nome, descricao, preco, horario_disponibilidade,quantidade)
             print("Refeição cadastrada com sucesso!")
 
         elif opcao == "10":
             nome = input("Nome da refeição a agendar: ")
             data = input("Data (AAAA-MM-DD): ")
             horario = input("Horário (HH:MM): ")
-            refeicao.agendar(data, horario)
+            refeicao.agendar(data, horario,nome)
             print("Refeição agendada com sucesso!")
 
         elif opcao == "11":
@@ -205,7 +203,7 @@ def menu():
                 print(item)
 
         elif opcao == "12":
-            faturamento = gerar_relatorio_faturamento(quartos, auditorio)
+            faturamento = gerar_relatorio_faturamento(quartos, auditorio,refeicao)
             print(f"Faturamento total: R${faturamento}")
 
         elif opcao == "13":
