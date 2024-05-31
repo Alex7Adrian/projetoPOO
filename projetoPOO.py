@@ -106,7 +106,7 @@ def menu():
         print("9. Cadastrar refeição")
         print("10. Agendar refeição")
         print("11. Gerar relatório de ocupação")
-        print("12. Gerar relatório de faturamento")
+        print("12. Gerar relatorio de faturamento")
         print("13. Sair")
 
         opcao = input("Escolha uma opção: ")
